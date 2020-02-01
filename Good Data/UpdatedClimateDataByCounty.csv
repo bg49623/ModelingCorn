@@ -1,4 +1,4 @@
-NAME,DATE,EMXP,EMXT,PRCP,SNOW,TMAX
+county,year,extreme_max_precip,extreme_max_temp,total_precip,snowfall,max_temp
 "Cottonwood, MN US",1980,3.89,100,21.14,29.4,58.9
 "Cottonwood, MN US",1981,3.1,,29.18,28.1,
 "Cottonwood, MN US",1982,1.8,99,30.55,46.7,53.6
