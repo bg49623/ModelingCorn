@@ -74,7 +74,7 @@ def precipitation_extremity(x, lower_bound):
     # y = np.where(x < lower_bound, lower_bound - x, 0)
     # z = np.where(x > upper_bound, x - upper_bound, 0)
     # return y ** 2 + z ** 2
-    return abs(x - lower_bound) ** 3
+    return (x - lower_bound) ** 2
 
 
 def temp_extremity(x, ideal):
@@ -104,22 +104,25 @@ plt.plot(time_points, precipitation(time_points), label='precip')
 plt.plot(time_points, temperature(time_points), label='temp')
 plt.plot(time_points, loss, label='loss')
 plt.legend()
-plt.show()
+# plt.show()
 # exit()
 
 # plt.plot(time, temperature(time))
 # plt.show()
 
+print(meanTemp)
 params = [0, meanTemp, 1, 1]
-params, _ = curve_fit(f_predicted_loss, time_points, loss, p0=[-.1, meanTemp, 1, 1])
+params, cov = curve_fit(f_predicted_loss, time_points, loss, p0=[.1, meanTemp, 1, 1])
 
 print(f_predicted_loss(time_points[0], params[0], params[1], params[2], params[3]))
 
 print(params)
+print(cov)
+print(np.sqrt(np.diagonal(cov)))
 
-# plt.plot(time_points, params[3] * precipitation_extremity(precipitation(time_points), params[0], params[1]),
+# plt.plot(time_points, params[2] * precipitation_extremity(precipitation(time_points), params[0])
 #          label='precip')
-# plt.plot(time_points, params[4] * temp_extremity(temperature(time_points), params[2]), label='temp')
+# plt.plot(time_points, params[3] * temp_extremity(temperature(time_points), params[1]), label='temp')
 
 plt.figure(2)
 
