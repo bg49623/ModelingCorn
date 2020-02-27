@@ -28,8 +28,6 @@ df2 = df2.loc[df2['Time'] >= 0]  # drop all rows before time we have loss data f
 df2 = df2.set_index('Time')
 precipitation = df2['Value'].astype('float32').to_numpy()
 
-precipitation = precipitation[:-1]  # remove extra due to added
-
 # temperature stuff
 
 df3 = pd.read_csv('Data/MinnesotaMonthlyTemperature.csv')
@@ -40,8 +38,6 @@ df3 = df3.groupby(['Time'], as_index=False).min()
 df3 = df3.loc[df3['Time'] >= 0]  # drop all rows before time we have loss data for
 df3 = df3.set_index('Time')
 temperature = df3['Value'].astype('float32').to_numpy()
-
-temperature = temperature[:-1]
 
 assert (len(precipitation) == len(temperature))
 
