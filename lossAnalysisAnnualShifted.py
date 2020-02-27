@@ -5,6 +5,7 @@ import pandas as pd
 import math
 from scipy.optimize import curve_fit
 from scipy import interpolate
+from scipy.stats import norm
 
 
 def years_from_1990(year, month):
@@ -78,7 +79,7 @@ def precipitation_extremity(x, lower_bound):
 
 
 def temp_extremity(x, ideal):
-    y = np.where(x < ideal, ideal - x, 0)
+    # y = np.where(x < ideal, ideal - x, 0)
     # return y ** 2
     return (x - ideal) ** 2
 
@@ -90,12 +91,21 @@ def f_predicted_loss(time, ideal_precipitation, ideal_temperature,
            + temperature_weight * temp_extremity(temperature(time), ideal_temperature)
 
 
-scale_factor = np.linalg.norm(loss)
-loss = normalize(loss)
-precipitation = normalize(precipitation)
-temperature = normalize(temperature)
+# scale variables to aid learning
+
+loss_scale = np.linalg.norm(loss)
+precipitation_scale = np.linalg.norm(precipitation)
+temperature_scale = np.linalg.norm(temperature)
+
+loss = loss / loss_scale
+precipitation = precipitation / precipitation_scale
+temperature = temperature = temperature / temperature_scale
+
+# save mean temperature for use with initial values
 
 meanTemp = temperature.mean()
+
+# interpolation to make continuous to allow scipy optimize
 
 precipitation = interpolate.interp1d(time_points, precipitation)
 temperature = interpolate.interp1d(time_points, temperature)
@@ -116,9 +126,20 @@ params, cov = curve_fit(f_predicted_loss, time_points, loss, p0=[.1, meanTemp, 1
 
 print(f_predicted_loss(time_points[0], params[0], params[1], params[2], params[3]))
 
-print(params)
+print('params:', params)
 print(cov)
-print(np.sqrt(np.diagonal(cov)))
+
+param_deviation = np.sqrt(np.diagonal(cov))
+
+param_confidence = param_deviation * norm.ppf(.9)
+
+print(param_deviation)
+print(param_confidence)
+
+print(param_confidence[0] * precipitation_scale)
+print(param_confidence[1] * temperature_scale)
+
+print()
 
 # plt.plot(time_points, params[2] * precipitation_extremity(precipitation(time_points), params[0])
 #          label='precip')
@@ -132,5 +153,6 @@ plt.plot(time_points, f_predicted_loss(time_points, params[0], params[1], params
          label='predict')
 plt.legend()
 # plt.show()
+
 
 plt.show()
